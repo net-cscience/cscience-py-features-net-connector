@@ -11,11 +11,12 @@ _connector: ClipConnector | None = None
 
 
 def initialize_once(config_path: str, unified_config: bool) -> None:
+    ClipConfig.set_default_config_directory(config_path)
     global _connector
     if _connector is not None:
         return
-    mode =  ConfigMode.CONFIG_PER_FEATURE if unified_config else ConfigMode.CONFIG_PER_FEATURE
-    _connector = ClipConnector(ClipConfig(config_path=config_path, mode=mode))
+    mode =  ConfigMode.UNIFIED_CONFIG if unified_config else ConfigMode.CONFIG_PER_FEATURE
+    _connector = ClipConnector(ClipConfig(mode=mode))
 
 def _get_connector() -> ClipConnector:
     if _connector is None:

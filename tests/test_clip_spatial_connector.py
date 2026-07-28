@@ -1,19 +1,22 @@
+import io
 import unittest
 from io import BytesIO
+from pathlib import Path
 
 from PIL import Image
 from cscience.features.api.utils.measure_time import measure_time
 
-from cscience.features.net_connector.clip_connector.clip_connector import get_service_info, get_feature_info, \
-    initialize_once, embed_text, embed_image
+from cscience.features.net_connector.clip_spatial_connector.clip_spatial_connector import get_service_info, \
+    get_feature_info, \
+    initialize_once, image_regions, score_regions
 
-
-class ClipConnectorTest(unittest.TestCase):
+FIXTURE_ROOT = Path(__file__).parent / "fixtures"
+class ClipSpatialConnectorTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         # runs once before any tests in this class
-        initialize_once()
+        initialize_once(str(FIXTURE_ROOT/"config"), False)
         pass
 
     @classmethod
@@ -41,18 +44,21 @@ class ClipConnectorTest(unittest.TestCase):
 
 
     @measure_time(times=10, ignore_first=True)
-    def test_text(self):
-        embed_text("a photo of a cat")
+    def test_image_regions(self):
+        image = Image.open("./fixtures/flickr-dog-1.jpg")
+        v = image_regions(image.tobytes())
+        pass
 
     @measure_time(times=10, ignore_first=True)
-    def test_image(self):
+    def test_score_regions(self):
+
         image = Image.open("./fixtures/flickr-dog-1.jpg")
         buffer = io.BytesIO()
         image.convert("RGB").save(buffer, format="JPEG", quality=95)
-        v = embed_image(buffer.getvalue())
 
-
-
+        v= image_regions(buffer.getvalue())
+        s = score_regions(["a photo of a dog", "a photo of a cat"], v)
+        pass
 
 if __name__ == '__main__':
     unittest.main()

@@ -11,10 +11,11 @@ _connector: OcrTesseractConnector | None = None
 
 
 def initialize_once(config_path: str, unified_config: bool) -> None:
+    OcrConfig.set_default_config_directory(config_path)
     global _connector
     if _connector is not None:
         return
-    mode =  ConfigMode.CONFIG_PER_FEATURE if unified_config else ConfigMode.CONFIG_PER_FEATURE
+    mode =  ConfigMode.UNIFIED_CONFIG if unified_config else ConfigMode.CONFIG_PER_FEATURE
     _connector = OcrTesseractConnector(OcrConfig(config_path=config_path, mode=mode))
 
 def _get_connector() -> OcrTesseractConnector:
@@ -33,6 +34,6 @@ def get_service_info() -> str:
     data = _get_connector().get_service_info()
     return json.dumps(asdict(data), default=vars)
 
-def embed_image(encoded_image_bytes: bytes) -> str:
+def extract(encoded_image_bytes: bytes) -> str:
     image = Image.open(io.BytesIO(encoded_image_bytes)).convert("RGB")
-    return json.dumps(asdict(_get_connector().extract(image)), default=vars)
+    return _get_connector().extract(image).text
