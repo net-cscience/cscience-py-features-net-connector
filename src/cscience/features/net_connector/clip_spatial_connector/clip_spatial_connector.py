@@ -51,3 +51,6 @@ def image_regions(encoded_image_bytes: bytes) ->  SpatialVectorBatchData[list[fl
 
 def score_regions(text: list[str], vectors:  SpatialVectorBatchData[list[float]]) -> SpatialScoreVectorBatch:
         return _get_connector().score_regions(text, vectors)
+
+def embed_text(text: str) -> list[float]:
+    return _get_connector().text(text)
